@@ -1,29 +1,28 @@
-# This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
-
-name: LEARN-NESTJS CI
-
+name: CI
 on:
   push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+    branches:
+      - master
 
 jobs:
-  build:
-
+  main:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [14.x]
-
     steps:
-    - uses: actions/checkout@v2
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
+    - name: Checkout
+      uses: actions/checkout@v2
       with:
-        node-version: ${{ matrix.node-version }}
-    - run: npm ci
-    - run: npm install
-    - run: npm run build
+        persist-credentials: false
+        
+    # react项目为npm run-script build，vue项目改为npm run build
+    - name: Install and Build
+      run: |
+        npm install
+        npm run build
+     
+    # react项目的FOLDER为build，vue项目改为dist   
+    - name: Deploy
+      uses: JamesIves/github-pages-deploy-action@releases/v3
+      with:
+        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        BRANCH: gh-pages
+        FOLDER: dist
